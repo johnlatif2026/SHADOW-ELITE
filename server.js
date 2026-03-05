@@ -616,11 +616,11 @@ app.delete('/admin/delete-result/:id', isAdminAuthenticated, async (req, res) =>
 
 app.get('/admin-login.html', (req, res) => {
   if (req.session.adminLoggedIn) return res.redirect('/admin/dashboard');
-  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+  res.sendFile(path.join(__dirname, 'admin-login.html'));
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 /* =========================
