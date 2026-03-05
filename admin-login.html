@@ -289,7 +289,7 @@
           const sessionData = await sessionCheck.json();
           
           if (sessionData.loggedIn) {
-            window.location.href = '/admin/dashboard.html';
+            window.location.href = '/dashboard.html';
           } else {
             errorMsg.textContent = 'فشل التحقق من الجلسة';
           }
