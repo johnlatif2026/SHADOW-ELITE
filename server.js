@@ -163,7 +163,7 @@ const sendEmailNotification = async (subject, htmlContent) => {
     }
 
     const mailOptions = {
-      from: `"Clan SHADOW_ELITE" <${process.env.SMTP_USER}>`,
+      from: `"Clan DH ESPORTS" <${process.env.SMTP_USER}>`,
       to: process.env.NOTIFICATION_EMAIL,
       subject,
       html: htmlContent,
@@ -614,7 +614,7 @@ app.delete('/admin/delete-result/:id', isAdminAuthenticated, async (req, res) =>
    Static Routes
 ========================= */
 
-app.get('/admin-login.html', (req, res) => {
+app.get('/login', (req, res) => {
   if (req.session.adminLoggedIn) return res.redirect('/admin/dashboard');
   res.sendFile(path.join(__dirname, 'admin-login.html'));
 });
