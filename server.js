@@ -19,6 +19,15 @@ const PORT = process.env.PORT || 3000;
    Helpers
 ========================= */
 
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 // ضمان وجود مجلدات ثابتة
 const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -64,13 +73,16 @@ const db = admin.firestore();
    Multer (Uploads)
 ========================= */
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'dh-esports',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'mp4', 'webp'],
+    public_id: (req, file) => Date.now() + '-' + file.originalname.split('.')[0],
+  },
 });
 
 const upload = multer({ storage });
-
 /* =========================
    Mail (Nodemailer)
 ========================= */
@@ -214,8 +226,8 @@ const ensureAdminUser = async () => {
 app.post('/api/booking', upload.single('bGameVideo'), async (req, res) => {
   try {
     const { bName, bEmail, bPhone, bScrim, bDuration, bAge } = req.body;
-    const gameVideo = req.file ? '/uploads/' + req.file.filename : null;
-
+const gameVideo = req.file ? req.file.path : null;
+     
     const id = uuidv4();
 
     await db.collection('bookings').doc(id).set({
@@ -492,15 +504,15 @@ app.post('/admin/send-message', isAdminAuthenticated, async (req, res) => {
     await transporter.sendMail({
       from: `"${senderName}" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: 'رسالة من كلان King ESPORTS',
+      subject: 'رسالة من كلان DH ESPORTS',
       html: `
 <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <h2 style="color: #4f46e5;">رسالة من Clan King ESPORTS</h2>
+  <h2 style="color: #4f46e5;">رسالة من Clan DH ESPORTS</h2>
   <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-top: 20px;">
     ${String(message || '').replace(/\n/g, '<br>')}
   </div>
   <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">
-    هذه الرسالة مرسلة من نظام Clan King ESPORTS - لا ترد على هذا البريد
+    هذه الرسالة مرسلة من نظام Clan DH ESPORTS - لا ترد على هذا البريد
     اذا احتجت الرد ابعت رسالتك هنا ${process.env.FRONTEND_URL || ''}/#inquiries
   </p>
 </div>
@@ -524,8 +536,8 @@ app.post('/admin/upload-result', isAdminAuthenticated, upload.single('resultFile
     }
 
     const id = uuidv4();
-    const fileUrl = '/uploads/' + req.file.filename;
-
+    const fileUrl = req.file.path;
+     
     await db.collection('results').doc(id).set({
       id,
       playerPhone,
