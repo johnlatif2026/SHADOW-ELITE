@@ -293,41 +293,48 @@
           </div>
         </div>
 
-        <!-- ===== Messages Tab ===== -->
-        <div id="messagesTab" class="tab-content hidden space-y-6">
-          <div class="rounded-3xl bg-white dark:bg-white/5 ring-1 ring-slate-200 dark:ring-white/10 shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-slate-200 dark:border-white/10">
-              <h2 class="text-lg font-extrabold">إرسال رسالة إلى اللاعب</h2>
-            </div>
-            <div class="p-5">
-              <form id="sendMessageForm" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">البريد الإلكتروني للاعب</label>
-                  <input type="email" id="playerEmail" required
-                    class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500/60">
-                </div>
+<!-- ===== Messages Tab ===== -->
+<div id="messagesTab" class="tab-content hidden space-y-6">
+  <div class="rounded-3xl bg-white dark:bg-white/5 ring-1 ring-slate-200 dark:ring-white/10 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-slate-200 dark:border-white/10">
+      <h2 class="text-lg font-extrabold">إرسال رسالة إلى اللاعب</h2>
+    </div>
+    <div class="p-5">
+      <form id="sendMessageForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">البريد الإلكتروني للاعب</label>
+          <input type="email" id="playerEmail" required
+            class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500/60">
+        </div>
 
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">اسم المرسل (اختياري)</label>
-                  <input type="text" id="senderName" placeholder="Clan SHADOW_ELITE"
-                    class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500/60">
-                </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">اسم المرسل (اختياري)</label>
+          <input type="text" id="senderName" placeholder="Clan DH_ESPORTS"
+            class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500/60">
+        </div>
 
-                <div>
-                  <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">الرسالة</label>
-                  <textarea id="messageContent" rows="5" required
-                    class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500/60"></textarea>
-                </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">الرسالة</label>
+          <textarea id="messageContent" rows="5" required
+            class="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/40 px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500/60"></textarea>
+        </div>
 
-                <button type="submit"
-                  class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500/70">
-                  إرسال الرسالة
-                </button>
-              </form>
+        <button type="submit"
+          class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500/70">
+          إرسال الرسالة
+        </button>
+      </form>
+
+      <!-- أضف هذا الـ div هنا -->
+      <div id="messageResponse" class="mt-4 hidden"></div>
+
+    </div>
+  </div>
+</div>
 
               <div id="messageResponse" class="mt-4 hidden"></div>
             </div>
