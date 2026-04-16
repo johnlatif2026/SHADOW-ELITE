@@ -789,52 +789,94 @@
       fileName.textContent = fileInput.files.length ? fileInput.files[0].name : '';
     });
 
-    // ===== Booking Form =====
+    // ===== Booking Form (تم التعديل والإصلاح) =====
     const bookingForm = document.getElementById('bookingForm');
     const bookingResponse = document.getElementById('bookingResponse');
+    const submitButton = bookingForm.querySelector('button[type="submit"]'); // زر الإرسال
 
     bookingForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+        e.preventDefault();
 
-      const formData = new FormData();
-      formData.append('bName', document.getElementById('bName').value);
-      formData.append('bEmail', document.getElementById('bEmail').value);
-      formData.append('bPhone', document.getElementById('bPhone').value);
-      formData.append('bScrim', document.getElementById('bScrim').value);
-      formData.append('bDuration', document.getElementById('bDuration').value);
-      formData.append('bAge', document.getElementById('bAge').value);
-      if (fileInput.files[0]) formData.append('bGameVideo', fileInput.files[0]);
-
-      bookingResponse.classList.add('hidden');
-      bookingResponse.innerHTML = '';
-
-      try {
-        const res = await fetch('/api/booking', { method: 'POST', body: formData });
-        const data = await res.json();
-
-        bookingResponse.classList.remove('hidden');
-        bookingResponse.innerHTML = `
-          <div class="mt-2 rounded-2xl p-4 ${res.ok ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-200' : 'bg-red-500/15 text-red-700 dark:text-red-200'}">
-            ${data.message || (res.ok ? 'تم تقديم طلبك بنجاح!' : 'حدث خطأ أثناء تقديم الطلب')}
-          </div>
-        `;
-
-        if (res.ok) {
-          showToast('تم الإرسال', 'تم تقديم طلبك بنجاح', 'success');
-          bookingForm.reset();
-          fileName.textContent = '';
-        } else {
-          showToast('خطأ', data.message || 'حصلت مشكلة أثناء الإرسال', 'error');
+        // 1. التحقق من وجود فيديو
+        const videoFile = fileInput.files[0];
+        if (!videoFile) {
+            showToast('خطأ', 'الرجاء رفع فيديو اللعب (حد أقصى 2 دقيقة)', 'error');
+            return;
         }
-      } catch (err) {
-        bookingResponse.classList.remove('hidden');
-        bookingResponse.innerHTML = `
-          <div class="mt-2 rounded-2xl p-4 bg-red-500/15 text-red-700 dark:text-red-200">
-            تعذر الاتصال بالخادم. حاول مرة أخرى.
-          </div>
-        `;
-        showToast('اتصال', 'تعذر الاتصال بالخادم', 'error');
-      }
+
+        // 2. التحقق من حجم الفيديو (اختياري ولكن مفيد - حد أقصى 20 ميجابايت مثلاً)
+        if (videoFile.size > 20 * 1024 * 1024) {
+            showToast('خطأ', 'حجم الفيديو كبير جداً. الحد الأقصى 20 ميجابايت', 'error');
+            return;
+        }
+
+        // 3. تعطيل الزر ومنع التكرار
+        if (submitButton) submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الإرسال...';
+
+        // 4. تجهيز FormData
+        const formData = new FormData();
+        formData.append('bName', document.getElementById('bName').value.trim());
+        formData.append('bEmail', document.getElementById('bEmail').value.trim());
+        formData.append('bPhone', document.getElementById('bPhone').value.trim());
+        formData.append('bScrim', document.getElementById('bScrim').value);
+        formData.append('bDuration', document.getElementById('bDuration').value);
+        formData.append('bAge', document.getElementById('bAge').value.trim());
+        formData.append('bGameVideo', videoFile); // يجب أن يكون الاسم مطابقاً لـ upload.single('bGameVideo')
+
+        // 5. إخفاء أي رسائل سابقة
+        bookingResponse.classList.add('hidden');
+        bookingResponse.innerHTML = '';
+
+        try {
+            // 6. إرسال البيانات
+            const res = await fetch('/api/booking', {
+                method: 'POST',
+                body: formData // لا تضع Content-Type هنا، المتصفح سيضعها تلقائياً مع الـ boundary
+            });
+
+            const data = await res.json();
+
+            // 7. معالجة الرد
+            if (res.ok && data.success) {
+                bookingResponse.classList.remove('hidden');
+                bookingResponse.innerHTML = `
+                    <div class="mt-2 rounded-2xl p-4 bg-emerald-500/15 text-emerald-700 dark:text-emerald-200">
+                        ✅ ${data.message || 'تم تقديم طلبك بنجاح! سيتم مراجعة طلبك قريباً.'}
+                    </div>
+                `;
+                showToast('تم الإرسال', 'تم تقديم طلبك بنجاح', 'success');
+                bookingForm.reset(); // إعادة تعيين النموذج
+                fileName.textContent = ''; // مسح اسم الملف المعروض
+                // إعادة تعيين حقل الملف (بسبب reset قد لا يعمل بشكل كامل في بعض المتصفحات)
+                fileInput.value = '';
+            } else {
+                // فشل من السيرفر
+                const errorMsg = data.message || 'حدث خطأ غير معروف أثناء تقديم الطلب';
+                bookingResponse.classList.remove('hidden');
+                bookingResponse.innerHTML = `
+                    <div class="mt-2 rounded-2xl p-4 bg-red-500/15 text-red-700 dark:text-red-200">
+                        ❌ ${errorMsg}
+                    </div>
+                `;
+                showToast('خطأ', errorMsg, 'error');
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            bookingResponse.classList.remove('hidden');
+            bookingResponse.innerHTML = `
+                <div class="mt-2 rounded-2xl p-4 bg-red-500/15 text-red-700 dark:text-red-200">
+                    ❌ تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.
+                </div>
+            `;
+            showToast('اتصال', 'تعذر الاتصال بالخادم', 'error');
+        } finally {
+            // 8. إعادة تفعيل الزر
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'إرسال الطلب';
+            }
+        }
     });
 
     // ===== Results Inquiry =====
